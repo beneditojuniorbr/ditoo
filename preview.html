@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dito App Preview</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --border-color: #eeeeee;
+            --accent-color: #000000;
+            --surface-color: #f9f9f9;
+            --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-primary); }
+        .container { max-width: 480px; margin: 0 auto; padding: 2rem; min-height: 100vh; display: flex; flex-direction: column; }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        button { cursor: pointer; border: none; background: none; }
+        input { outline: none; border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius); width: 100%; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .card { padding: 1.5rem 1rem; border: 1px solid #eee; border-radius: 20px; display: flex; flex-direction: column; alignItems: center; gap: 0.8rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const Icon = ({ name, size = 24, style = {} }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size, ...style }}></i>;
+        };
+
+        const Login = ({ onLogin }) => (
+            <div className="container fade-in" style={{ justifyContent: 'center' }}>
+                <div style={{ marginBottom: '3rem' }}>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: '700' }}>Dito</h1>
+                    <p style={{ color: 'var(--text-secondary)' }}>Acesse sua área do cliente</p>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <div style={{ position: 'relative' }}>
+                        <Icon name="user" size={20} style={{ position: 'absolute', left: '12px', top: '16px', color: '#999' }} />
+                        <input type="email" placeholder="E-mail" style={{ paddingLeft: '2.8rem' }} />
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                        <Icon name="lock" size={20} style={{ position: 'absolute', left: '12px', top: '16px', color: '#999' }} />
+                        <input type="password" placeholder="Senha" style={{ paddingLeft: '2.8rem' }} />
+                    </div>
+                    <button 
+                        onClick={onLogin}
+                        style={{ backgroundColor: '#000', color: '#fff', padding: '1rem', borderRadius: 'var(--radius)', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                    >
+                        Entrar <Icon name="arrow-right" size={20} />
+                    </button>
+                </div>
+            </div>
+        );
+
+        const BottomNav = ({ activeTab, onTabChange }) => {
+            const navItems = [
+                { id: 'home', label: 'Início', icon: 'home' },
+                { id: 'marketplace', label: 'Mercado', icon: 'shopping-cart' },
+                { id: 'products', label: 'Produtos', icon: 'package' },
+                { id: 'links', label: 'Links', icon: 'link' },
+                { id: 'withdraw', label: 'Sacar', icon: 'wallet' },
+                { id: 'profile', label: 'Perfil', icon: 'user' }
+            ];
+
+            return (
+                <nav style={{
+                    position: 'fixed', bottom: 0, left: 0, right: 0,
+                    backgroundColor: '#ffffff', display: 'flex', justifyContent: 'space-around',
+                    alignItems: 'center', padding: '0.8rem 0.2rem', borderTop: '1px solid #eeeeee',
+                    zIndex: 1000
+                }}>
+                    {navItems.map(item => (
+                        <button key={item.id} onClick={() => onTabChange(item.id)} style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
+                            color: activeTab === item.id ? '#000000' : '#bbbbbb', flex: 1
+                        }}>
+                            <Icon name={item.icon} size={22} />
+                            <span style={{ fontSize: '0.65rem', fontWeight: activeTab === item.id ? '600' : '400' }}>{item.label}</span>
+                        </button>
+                    ))}
+                </nav>
+            );
+        };
+
+        const Dashboard = ({ onLogout }) => {
+            const [activeTab, setActiveTab] = React.useState('home');
+
+            return (
+                <div className="container fade-in" style={{ padding: '1.5rem', paddingBottom: '80px' }}>
+                    <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                        <div>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: '700' }}>Olá, Usuário</h2>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Bem-vindo ao Dito</p>
+                        </div>
+                        <button onClick={onLogout} style={{ padding: '0.5rem', borderRadius: '50%', backgroundColor: '#f0f0f0' }}>
+                            <Icon name="log-out" size={20} />
+                        </button>
+                    </header>
+
+                    {activeTab === 'home' ? (
+                        <>
+                            <div style={{ backgroundColor: '#f9f9f9', padding: '2rem', borderRadius: '24px', marginBottom: '2rem', border: '1px solid #eee' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                                    <Icon name="trending-up" size={16} />
+                                    <span style={{ fontSize: '0.85rem', fontWeight: '500' }}>Saldo total</span>
+                                </div>
+                                <div style={{ fontSize: '2rem', fontWeight: '700' }}>R$ 1.250,00</div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+                                    <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Icon name="plus" size={28} />
+                                    </div>
+                                    <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>Criar produto</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+                                    <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#f5f5f5', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #eee' }}>
+                                        <Icon name="bar-chart" size={28} />
+                                    </div>
+                                    <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>Ver vendas</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+                                    <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#f5f5f5', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #eee' }}>
+                                        <Icon name="trophy" size={28} />
+                                    </div>
+                                    <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>Hall da Fama</span>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div style={{ textAlign: 'center', color: '#999', marginTop: '2rem' }}>Página de {activeTab} em breve...</div>
+                    )}
+
+                    <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            return isLoggedIn ? <Dashboard onLogout={() => setIsLoggedIn(false)} /> : <Login onLogin={() => setIsLoggedIn(true)} />;
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
